@@ -30,6 +30,6 @@ function bumpAllTrades()
     for (let i = 0; i < bumpButtons.length; i++) {
         setTimeout(() => {
             bumpButtons[i].click();
-        }, i * 1100);
+        }, i * 1250);
     }
 }
