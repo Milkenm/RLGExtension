@@ -3,7 +3,7 @@
   "name": "RLG Extension",
   "version": "1.0",
   "author": "Milkenm",
-  "description": "Bump all trades on RL Garage with a single click",
+  "description": "Bump all trades on RL Garage with a single click.",
   "content_scripts": [
     {
       "matches": [
