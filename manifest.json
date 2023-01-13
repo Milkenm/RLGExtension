@@ -10,8 +10,25 @@
         "https://rocket-league.com/*"
       ],
       "run_at": "document_end",
-      "js": [ "scripts/trade_bumper.js" ],
       "css": [ "styles/rlge_style.css" ]
+    },
+    {
+      "matches": [
+        "https://rocket-league.com/trades/*"
+      ],
+      "run_at": "document_end",
+      "js": [
+        "scripts/trade_bumper.js"
+      ]
+    },
+    {
+      "matches": [
+        "https://rocket-league.com/"
+      ],
+      "run_at": "document_end",
+      "js": [
+        "scripts/item_prices.js"
+      ]
     }
   ],
    "icons": {
