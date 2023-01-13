@@ -56,7 +56,7 @@ getItemValues("stride_tide", itemTypes.DECAL, colors.UNPAINTED, platforms.PC, (i
 	console.log(itemValue);
 });
 
-function getItemInfo(rlgUrl) {
+function getItemInfo(url = "lel", callback) {
 	/*
 	 * Example decal (Black Market Stride Tide):
 	 * RLG: https://rocket-league.com/items/decals/blackmarket/stride-tide
@@ -69,8 +69,61 @@ function getItemInfo(rlgUrl) {
 	 * Example wheels (Exotic Dire Wolf [Black]):
 	 * RLG: https://rocket-league.com/items/wheels/dire-wolf
 	 * RLI: https://rl.insider.gg/en/pc/wheels/dire_wolf/black
+	 * 
+	 * Example crate (Golden Gift '22):
+	 * RLG: https://rocket-league.com/items/misc/golden-gift-22
+	 * RLI: https://rl.insider.gg/en/pc/crates/golden_gift_22
 	 */
 
+
+	// Replace base URL
+	let newUrl = url.replace("https://rocket-league.com/items/", "https://rl.insider.gg/en/pc/");
+
+
+	// Colors
+	newUrl = newUrl.replace("titaniumwhite", "white")
+		.replace("skyblue", "sblue")
+		.replace("burntsienna", "sienna")
+		.replace("forestgreen", "fgreen");
+
+
+	// Crates
+	newUrl = newUrl.replace("misc", "crates");
+
+	// Bodies
+	newUrl = newUrl.replace("bodies", "cars");
+
+	// Decals
+	newUrl = newUrl.replace("blackmarket" | "global", "");
+
+	// Wheels
+	newUrl = newUrl.replace("-", "_");
+
+	// Paint Finishes
+	newUrl = newUrl.replace("paints", "paint_finishes");
+
+
+
+
+
+	// DECALS
+	if (url.startsWith("https://rocket-league.com/items/decals")) {
+		let split = url.replace("https://rocket-league.com/items/decals").split("/");
+		let car = null;
+		if (split == "blackmarket" | "global") {
+			car = cars.GLOBAL;
+		}
+		else {
+			car = split[0];
+		}
+		let decal = split[1].replace("-", "_");
+		let color = colors.UNPAINTED;
+		if (split[2]) {
+			color = colors[split[2]];
+		}
+		let info = new ItemDetails(decal, itemTypes.DECAL, color, car);
+		callback(info);
+	}
 }
 
 function getItemValues(itemInfo, platform, callback) {
