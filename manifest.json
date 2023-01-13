@@ -10,7 +10,7 @@
         "https://rocket-league.com/*"
       ],
       "run_at": "document_end",
-      "js": [ "scripts/content.js" ],
+      "js": [ "scripts/trade_bumper.js" ],
       "css": [ "styles/rlge_style.css" ]
     }
   ],
