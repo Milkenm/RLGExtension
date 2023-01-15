@@ -1,0 +1,9 @@
+.rlg-item__paint.--orange {
+	background: linear-gradient(135deg,#ffa75c,#a57711 80%) !important;
+	border-color: #ffb466 !important;
+}
+
+.rlg-item__paint.--forest-green {
+	background: linear-gradient(135deg,#67cf6d,#125e15 80%) !important;
+	border-color: #30a536 !important;
+}

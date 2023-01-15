@@ -11,7 +11,7 @@
 	  ],
 	  "run_at": "document_end",
 	  "css": [
-		"styles/rlge_style.css"
+		"styles/rlge_overrides.css"
 	  ]
 	},
 	{
@@ -21,13 +21,14 @@
 	  "run_at": "document_end",
 	  "js": [
 		"scripts/trade_bumper.js"
+	  ],
+	  "css": [
+		"styles/rlge_style.css"
 	  ]
 	},
 	{
 	  "matches": [
-		"https://rocket-league.com/*",
-		"https://rocket-league.com/items/*", /* TODO */
-		"https://github.com/*"
+		"https://rocket-league.com/*"
 	  ],
 	  "run_at": "document_end",
 	  "js": [
