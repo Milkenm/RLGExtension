@@ -5,7 +5,7 @@ const platforms = {
 	SWITCH: "switch"
 };
 
-const itemTypes = {
+const types = {
 	DECAL: "decals",
 	CRATE: "crates",
 	BODY: "cars",
@@ -19,6 +19,26 @@ const itemTypes = {
 	ENGINE_SOUND: "engine_sounds",
 	BANNER: "banners",
 	BORDER: "avatar_borders"
+};
+
+const subTypes = {
+	ROASTED: "roasted",
+	OBVERSE: "obvserse",
+	INVERTED: "inverted",
+	INFINITE: "infinite",
+	CRYSTALIZED: "crystalized",
+	HOLOGRAPHIC: "holographic",
+	GLITCHED: "glitched",
+	REVOLVED: "revolved",
+	HATCH: "hatch",
+	RADIANT: "radiant",
+	SACRED: "sacred",
+	REMIXED: "remixed",
+	FLARE: "flare",
+	SCHEMATIZED: "schematized",
+	MULTICHROME: "multichrome",
+	SCORCHED: "scorched",
+	FROZEN: "frozen"
 };
 
 const colors = {
@@ -52,11 +72,68 @@ const cars = {
 	OCTANE_ZSR: "octane_zsr"
 }
 
-getItemValues("stride_tide", itemTypes.DECAL, colors.UNPAINTED, platforms.PC, (itemValue) => {
-	console.log(itemValue);
-});
+class ItemInfo {
+	constructor(itemName, itemType, itemSubType, itemColor, car) {
+		this.car = car;
+		this.itemName = itemName;
+		this.itemType = itemType;
+		this.itemSubType = itemSubType;
+		this.itemColor = itemColor;
+	}
 
-function getItemInfo(url = "lel", callback) {
+	displayInfo() {
+		return "Item Name: " + this.itemName
+			+ "\nItem Type: " + this.itemType
+			+ "\nItem Sub-Type: " + this.itemSubType
+			+ "\nItem Color: " + this.itemColor
+			+ "\nCar: " + this.car;
+	}
+}
+
+class ItemValue {
+	constructor(item, minPrice, maxPrice, avgPrice, craftPrice, minBpPrice, maxBpPrice) {
+		this.item = item;
+		this.minPrice = minPrice;
+		this.maxPrice = maxPrice;
+		this.avgPrice = avgPrice;
+		this.craftPrice = craftPrice;
+		this.minBpPrice = minBpPrice;
+		this.maxBpPrice = maxBpPrice;
+	}
+
+	displayInfo() {
+		return "Item: " + this.item
+			+ "\nMinimum price: " + this.minPrice
+			+ "\nMaximum price: " + this.maxPrice
+			+ "\nAverage price: " + this.avgPrice
+			+ "\nCrafting Cost: " + this.craftPrice
+			+ "\nMinimum Blueprint Value: " + this.minBpPrice
+			+ "\nMaximum Blueprint Value: " + this.maxBpPrice;
+	}
+}
+
+const items = document.getElementsByClassName("rlg-item");
+
+for (i = 0; i < items.length; i++) {
+	let links = items[i].getElementsByClassName("rlg-item-links")[0];
+	let primary = links.getElementsByClassName("rlg-btn-primary")[0];
+	let link = primary.href;
+	let newLink = getItemInfo(link);
+	if (newLink != null) {
+			getItemValues(newLink, platforms.PC, (itemValue) => {
+				// Create the "Bump All" button
+				let bumpAllButton = document.createElement("a");
+				bumpAllButton.textContent = itemValue.minPrice + " - " + itemValue.maxPrice;
+
+				links.insertBefore(bumpAllButton, links[0]);
+			});
+	}
+}
+
+function getItemInfo(url) {
+	if (url.includes("credits")) {
+		return null;
+	}
 	/*
 	 * Example decal (Black Market Stride Tide):
 	 * RLG: https://rocket-league.com/items/decals/blackmarket/stride-tide
@@ -75,65 +152,133 @@ function getItemInfo(url = "lel", callback) {
 	 * RLI: https://rl.insider.gg/en/pc/crates/golden_gift_22
 	 */
 
-
 	// Replace base URL
-	let newUrl = url.replace("https://rocket-league.com/items/", "https://rl.insider.gg/en/pc/");
-
+	let newUrl = url.replace("https://rocket-league.com/items/", "https://rl.insider.gg/en/<platform>/");
 
 	// Colors
 	newUrl = newUrl.replace("titaniumwhite", "white")
 		.replace("skyblue", "sblue")
 		.replace("burntsienna", "sienna")
 		.replace("forestgreen", "fgreen");
-
+	// Replace sub-types
+	newUrl = newUrl.replace("-roasted", "/roasted")
+		.replace("-obverse", "/obverse")
+		.replace("-inverted", "/inverted")
+		.replace("-infinite", "/infinite")
+		.replace("-cystalized", "/crystalized")
+		.replace("-holographic", "/holographic")
+		.replace("-glitched", "/glitched")
+		.replace("-revolved", "/revolved")
+		.replace("-hatch", "/hatch")
+		.replace("-radiant", "/radiant")
+		.replace("-sacred", "/sacred")
+		.replace("-remixed", "/remixed")
+		.replace("-flare", "/flare")
+		.replace("-schematized", "/schematized")
+		.replace("-multichrome", "/multichrome")
+		.replace("-scorched", "/scorched")
+		.replace("-frozen", "/frozen");
+	// Repalce - with _
+	newUrl = newUrl.replaceAll("-", "_");
 
 	// Crates
-	newUrl = newUrl.replace("misc", "crates");
+	if (newUrl.includes("misc")) {
+		/*
+		 * https://rocket-league.com/items/misc/golden-egg-18
+		 */
+		newUrl = newUrl.replace("misc", "crates");
+	}
 
 	// Bodies
-	newUrl = newUrl.replace("bodies", "cars");
+	else if (newUrl.includes("bodies")) {
+		/*
+		 * https://rocket-league.com/items/bodies/fennec
+		 * https://rocket-league.com/items/bodies/fennec/titaniumwhite
+		 */
+		newUrl = newUrl.replace("bodies", "cars");
+	}
 
 	// Decals
-	newUrl = newUrl.replace("blackmarket" | "global", "");
+	else if (newUrl.includes("blackmarket") || newUrl.includes("global")) {
+		/* 
+		 * https://rocket-league.com/items/decals/blackmarket/20xx
+		 * https://rocket-league.com/items/decals/blackmarket/20xx/black
+		 * https://rocket-league.com/items/decals/global/swirls
+		 * https://rocket-league.com/items/decals/octane/tumbling-blocks
+		 * https://rocket-league.com/items/decals/octane/tumbling-blocks/black
+		 */
 
-	// Wheels
-	newUrl = newUrl.replace("-", "_");
+		newUrl = newUrl.replace("blackmarket/", "")
+			.replace("global/", "");
+	}
 
 	// Paint Finishes
-	newUrl = newUrl.replace("paints", "paint_finishes");
-
-
-
-
-
-	// DECALS
-	if (url.startsWith("https://rocket-league.com/items/decals")) {
-		let split = url.replace("https://rocket-league.com/items/decals").split("/");
-		let car = null;
-		if (split == "blackmarket" | "global") {
-			car = cars.GLOBAL;
-		}
-		else {
-			car = split[0];
-		}
-		let decal = split[1].replace("-", "_");
-		let color = colors.UNPAINTED;
-		if (split[2]) {
-			color = colors[split[2]];
-		}
-		let info = new ItemDetails(decal, itemTypes.DECAL, color, car);
-		callback(info);
+	else if (newUrl.includes("paints")) {
+		/*
+		 * https://rocket-league.com/items/paints/chipboard
+		 */
+		newUrl = newUrl.replace("paints", "paint_finishes");
 	}
+
+	// Wheels
+	else if (newUrl.includes("wheels")) {
+		/*
+		 * https://rocket-league.com/items/wheels/automaton
+		 * https://rocket-league.com/items/wheels/automaton/black
+		 * https://rocket-league.com/items/wheels/automaton-inverted
+		 * https://rocket-league.com/items/wheels/automaton-inverted/black
+		 */
+	}
+
+	// Boosts
+	else if (newUrl.includes("boosts")) {
+	}
+
+	// Toppers
+	else if (newUrl.includes("toppers")) {
+	}
+
+	// Antennas
+	else if (newUrl.includes("antennas")) {
+	}
+
+	// Goal Explosions
+	else if (newUrl.includes("explosions")) {
+		newUrl = newUrl.replace("explosions", "goal_explosions");
+	}
+
+	// Trails
+	else if (newUrl.includes("trails")) {
+	}
+
+	// Engine Audios
+	else if (newUrl.includes("engines")) {
+		newUrl = newUrl.replace("engines", "engine_sounds");
+	}
+
+	// Player Banners
+	else if (newUrl.includes("banners")) {
+		type = types.BANNER;
+	}
+
+	// Avatar Borders
+	else if (newUrl.includes("borders")) {
+		newUrl = newUrl.replace("borders", "avatar_borders");
+	}
+
+	return newUrl;
 }
 
-function getItemValues(itemInfo, platform, callback) {
-	let url = "https://api.codetabs.com/v1/proxy/?quest=rl.insider.gg/en/" + platform + "/" + itemInfo.itemType + "/" + itemInfo.itemName;
-	if (itemInfo.itemColor != colors.UNPAINTED) {
-		url += "/" + itemInfo.itemColor;
-	}
-	console.log("Url: " + url);
-	fetch(url)
+function getItemValues(url, platform, callback) {
+	url = url.replace("<platform>", platform);
+	let proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
+	fetch(proxyUrl)
 		.then((response) => {
+			if (!response.status != 200) {
+				console.log("There was a problem obtaining price info for item.");
+				/*return getItemValues(url, platform, callback);*/
+				return null;
+			}
 			response.text().then((text) => {
 				// Get item cost
 				let itemCostStr = text.substring(
@@ -145,7 +290,6 @@ function getItemValues(itemInfo, platform, callback) {
 					if (c == "\"") break;
 					itemCost += c;
 				}
-				console.log("item cost: " + itemCost);
 
 				// Get crafting cost
 				let craftingCostStr = text.substring(
@@ -157,57 +301,21 @@ function getItemValues(itemInfo, platform, callback) {
 					if (c == "<") break;
 					craftingCost += c;
 				}
-				console.log("crafting cost: " + craftingCost)
 
 				// Calculate values
-				let splitPrice = itemCostStr.split(" - ");
+				let splitPrice = itemCost.split(" - ");
 				let minPrice = parseInt(splitPrice[0]);
 				let maxPrice = parseInt(splitPrice[1]);
 				let avgPrice = (minPrice + maxPrice) / 2;
 				let craftPrice = parseInt(craftingCost);
-				let bpPrice = maxPrice - craftPrice;
+				let minBpPrice = minPrice - craftPrice;
+				let maxBpPrice = maxPrice - craftPrice;
 
-				console.log("return");
-
-				let iv = new ItemValue(minPrice, maxPrice, avgPrice, craftPrice, bpPrice);
+				let iv = new ItemValue(url, minPrice, maxPrice, avgPrice, craftPrice, minBpPrice, maxBpPrice);
 				callback(iv);
 			});
 		})
 		.catch((error) => {
 			console.log("There was a problem obtaining price info for item:\n" + error);
 		});
-}
-
-class ItemDetails {
-	constructor(itemName, itemType, itemColor, car) {
-		this.car = car;
-		this.itemName = itemName;
-		this.itemType = itemType;
-		this.itemColor = itemColor;
-	}
-
-	displayInfo() {
-		return "Item name: " + this.itemName
-			+ "\nItem type: " + this.itemType
-			+ "\nItem Color: " + this.itemColor
-			+ "\nCar: " + this.car;
-	}
-}
-
-class ItemValue {
-	constructor(minPrice, maxPrice, avgPrice, craftPrice, bpPrice) {
-		this.minPrice = minPrice;
-		this.maxPrice = maxPrice;
-		this.avgPrice = avgPrice;
-		this.craftPrice = craftPrice;
-		this.bpPrice = bpPrice;
-	}
-
-	displayInfo() {
-		return "Minimum price: " + this.minPrice
-			+ "\nMaximum price: " + this.maxPrice
-			+ "\nAverage price: " + this.avgPrice
-			+ "\nCrafting Cost: " + this.craftPrice
-			+ "\nBlueprint Value: " + this.bpPrice;
-	}
 }

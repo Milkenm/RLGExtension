@@ -6,6 +6,7 @@ let bumpAllButton = document.createElement("button");
 bumpAllButton.textContent = "Bump All";
 bumpAllButton.id = "rlge-bump-all-trades-btn";
 bumpAllButton.classList = "rlge-btn-bump-all-trades rlg-btn-primary";
+
 // "Bump All" button click
 bumpAllButton.addEventListener("click", () => {
 	const bumpDelay = 1300;
