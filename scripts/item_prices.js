@@ -271,7 +271,7 @@ function getItemInfo(url) {
 
 function getItemValues(url, platform, callback) {
 	url = url.replace("<platform>", platform);
-	let proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
+	let proxyUrl = 'https://corsproxy.milkenm.workders.dev/?' + encodeURIComponent(url);
 	fetch(proxyUrl)
 		.then((response) => {
 			if (!response.status != 200) {
