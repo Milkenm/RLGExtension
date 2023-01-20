@@ -115,18 +115,21 @@ class ItemValue {
 const items = document.getElementsByClassName("rlg-item");
 
 for (i = 0; i < items.length; i++) {
+	if (items == null) { break; }
 	let links = items[i].getElementsByClassName("rlg-item-links")[0];
+	if (links == null) { break; }
 	let primary = links.getElementsByClassName("rlg-btn-primary")[0];
+	if (primary == null) { continue; }
 	let link = primary.href;
 	let newLink = getItemInfo(link);
 	if (newLink != null) {
-			getItemValues(newLink, platforms.PC, (itemValue) => {
-				// Create the "Bump All" button
-				let bumpAllButton = document.createElement("a");
-				bumpAllButton.textContent = itemValue.minPrice + " - " + itemValue.maxPrice;
+		getItemValues(newLink, platforms.PC, (itemValue) => {
+			// Create the "Bump All" button
+			let bumpAllButton = document.createElement("a");
+			bumpAllButton.textContent = itemValue.minPrice + " - " + itemValue.maxPrice;
 
-				links.insertBefore(bumpAllButton, links[0]);
-			});
+			links.insertBefore(bumpAllButton, links[0]);
+		});
 	}
 }
 
@@ -155,115 +158,121 @@ function getItemInfo(url) {
 	// Replace base URL
 	let newUrl = url.replace("https://rocket-league.com/items/", "https://rl.insider.gg/en/<platform>/");
 
-	// Colors
-	newUrl = newUrl.replace("titaniumwhite", "white")
-		.replace("skyblue", "sblue")
-		.replace("burntsienna", "sienna")
-		.replace("forestgreen", "fgreen");
-	// Replace sub-types
-	newUrl = newUrl.replace("-roasted", "/roasted")
-		.replace("-obverse", "/obverse")
-		.replace("-inverted", "/inverted")
-		.replace("-infinite", "/infinite")
-		.replace("-cystalized", "/crystalized")
-		.replace("-holographic", "/holographic")
-		.replace("-glitched", "/glitched")
-		.replace("-revolved", "/revolved")
-		.replace("-hatch", "/hatch")
-		.replace("-radiant", "/radiant")
-		.replace("-sacred", "/sacred")
-		.replace("-remixed", "/remixed")
-		.replace("-flare", "/flare")
-		.replace("-schematized", "/schematized")
-		.replace("-multichrome", "/multichrome")
-		.replace("-scorched", "/scorched")
-		.replace("-frozen", "/frozen");
-	// Repalce - with _
-	newUrl = newUrl.replaceAll("-", "_");
-
-	// Crates
-	if (newUrl.includes("misc")) {
+	let replacements = [
 		/*
+		 * Colors
+		 */
+		["titaniumwhite", "white"],
+		["skyblue", "sblue"],
+		["burntsienna", "sienna"],
+		["forestgreen", "fgreen"],
+		/* 
+		 * Sub-types
+		 */
+		["-roasted", "/roasted"],
+		["-obverse", "/obverse"],
+		["-inverted", "/inverted"],
+		["-infinite", "/infinite"],
+		["-cystalized", "/crystalized"],
+		["-holographic", "/holographic"],
+		["-glitched", "/glitched"],
+		["-revolved", "/revolved"],
+		["-hatch", "/hatch"],
+		["-radiant", "/radiant"],
+		["-sacred", "/sacred"],
+		["-remixed", "/remixed"],
+		["-flare", "/flare"],
+		["-schematized", "/schematized"],
+		["-multichrome", "/multichrome"],
+		["-scorched", "/scorched"],
+		["-frozen", "/frozen"],
+		/*
+		 * Replace - with _
+		 */
+		["-", "_"],
+		/*
+		 * Crates
 		 * https://rocket-league.com/items/misc/golden-egg-18
 		 */
-		newUrl = newUrl.replace("misc", "crates");
-	}
-
-	// Bodies
-	else if (newUrl.includes("bodies")) {
+		["misc", "crates"],
 		/*
+		 * Bodies
 		 * https://rocket-league.com/items/bodies/fennec
 		 * https://rocket-league.com/items/bodies/fennec/titaniumwhite
 		 */
-		newUrl = newUrl.replace("bodies", "cars");
-	}
-
-	// Decals
-	else if (newUrl.includes("blackmarket") || newUrl.includes("global")) {
-		/* 
+		["bodies", "cars"],
+		/*
+		 * Decals
 		 * https://rocket-league.com/items/decals/blackmarket/20xx
 		 * https://rocket-league.com/items/decals/blackmarket/20xx/black
 		 * https://rocket-league.com/items/decals/global/swirls
 		 * https://rocket-league.com/items/decals/octane/tumbling-blocks
 		 * https://rocket-league.com/items/decals/octane/tumbling-blocks/black
 		 */
-
-		newUrl = newUrl.replace("blackmarket/", "")
-			.replace("global/", "");
-	}
-
-	// Paint Finishes
-	else if (newUrl.includes("paints")) {
+		["blackmarket/", ""],
+		["global/", ""],
 		/*
+		 * Paint Finishes
 		 * https://rocket-league.com/items/paints/chipboard
 		 */
-		newUrl = newUrl.replace("paints", "paint_finishes");
-	}
-
-	// Wheels
-	else if (newUrl.includes("wheels")) {
+		["paints", "paint_finishes"],
 		/*
-		 * https://rocket-league.com/items/wheels/automaton
-		 * https://rocket-league.com/items/wheels/automaton/black
-		 * https://rocket-league.com/items/wheels/automaton-inverted
-		 * https://rocket-league.com/items/wheels/automaton-inverted/black
+		 * Goal Explosions
 		 */
+		["explosions", "goal_explosions"],
+		/*
+		 * Engine Audios
+		 */
+		["engines", "engine_sounds"],
+		/*
+		 * Avatar Borders
+		 */
+		["borders", "avatar_borders"],
+		/*
+		 * This: '
+		 */
+		["jakd", "jak_d"],
+		["smore", "s_more"],
+		["widows_web", "widow_s_web"],
+		["pirates_hat", "pirate_s_hat"],
+		["chefs_hat", "chef_s_hat"],
+		["witchs_hat", "witch_s_hat"],
+		["bobs_ramen", "bob_s_ramen"],
+		["devils_advocate", "devil_s_advocate"],
+		["captains_hat", "captain_s_hat"],
+		["sloths_hat", "slot_s_hat"],
+		["new_years_2017", "new_year_s_2017"],
+		["daves_bread", "dave_s_bread"],
+		["winters_warmth", "winter_s_warmth"]
+	];
+	for (let i = 0; i < replacements.length; i++) {
+		console.log("index: " + i);
+		console.log("r1: " + replacements[i, 0] + ", r2: " + replacements[i + 1, 1]);
+		newUrl = newUrl.replace(replacements[i, 0], replacements[i + 1, 1]);
 	}
 
-	// Boosts
-	else if (newUrl.includes("boosts")) {
+	// Pixelated Shades
+	if (newUrl.includes("pixelated_shades") && !newUrl.includes("multichrome")) {
+		newUrl = newUrl.replace("pixelated_shades", "pixelated_shades/rare");
 	}
 
-	// Toppers
-	else if (newUrl.includes("toppers")) {
-	}
-
-	// Antennas
-	else if (newUrl.includes("antennas")) {
-	}
-
-	// Goal Explosions
-	else if (newUrl.includes("explosions")) {
-		newUrl = newUrl.replace("explosions", "goal_explosions");
-	}
-
-	// Trails
-	else if (newUrl.includes("trails")) {
-	}
-
-	// Engine Audios
-	else if (newUrl.includes("engines")) {
-		newUrl = newUrl.replace("engines", "engine_sounds");
-	}
-
-	// Player Banners
-	else if (newUrl.includes("banners")) {
-		type = types.BANNER;
-	}
-
-	// Avatar Borders
-	else if (newUrl.includes("borders")) {
-		newUrl = newUrl.replace("borders", "avatar_borders");
+	// Alpha + Beta Rewards
+	if (newUrl.includes("aplha_reward") || newUrl.includes("beta_reward")) {
+		let rewardSplit = newUrl.split("/");
+		let itemName = rewardSplit[rewardSplit.length - 1];
+		let nameSplit = itemName.split("_");
+		let newName = "";
+		for (let i = 0; i < nameSplit.length; i++) {
+			if (rewardSplit[i] == "alpha" || rewardSplit[i] == "beta") {
+				break;
+			}
+			if (newName != "") {
+				newName += "_";
+			}
+			newName += rewardSplit[i];
+		}
+		newUrl = newUrl.replace(itemName, newName);
+		console.log("new url: " + newUrl);
 	}
 
 	return newUrl;
@@ -271,10 +280,13 @@ function getItemInfo(url) {
 
 function getItemValues(url, platform, callback) {
 	url = url.replace("<platform>", platform);
-	let proxyUrl = 'https://corsproxy.milkenm.workders.dev/?' + encodeURIComponent(url);
+	let proxyUrl = 'https://corsproxy.milkenm.workers.dev/?' + encodeURIComponent(url);
 	fetch(proxyUrl)
 		.then((response) => {
-			if (!response.status != 200) {
+			if (response.status != 200) {
+				if (response.status == 503) {
+					return getItemValues(url, platform, callback);
+				}
 				console.log("There was a problem obtaining price info for item.");
 				/*return getItemValues(url, platform, callback);*/
 				return null;
