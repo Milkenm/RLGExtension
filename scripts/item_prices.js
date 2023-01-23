@@ -247,8 +247,8 @@ function getItemInfo(url) {
 	];
 	for (let i = 0; i < replacements.length; i++) {
 		console.log("index: " + i);
-		console.log("r1: " + replacements[i, 0] + ", r2: " + replacements[i + 1, 1]);
-		newUrl = newUrl.replace(replacements[i, 0], replacements[i + 1, 1]);
+		console.log("r1: " + replacements[i][0] + ", r2: " + replacements[i][1]);
+		newUrl = newUrl.replaceAll(replacements[i][0], replacements[i][1]);
 	}
 
 	// Pixelated Shades
