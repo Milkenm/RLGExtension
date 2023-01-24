@@ -33,6 +33,9 @@
 	  "run_at": "document_end",
 	  "js": [
 		"scripts/item_prices.js"
+	  ],
+	  "css": [
+		"styles/rlge_prices.css"
 	  ]
 	}
   ],

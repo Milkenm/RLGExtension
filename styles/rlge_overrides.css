@@ -7,3 +7,7 @@
 	background: linear-gradient(135deg,#67cf6d,#125e15 80%) !important;
 	border-color: #30a536 !important;
 }
+
+.rlg-item__quantity {
+	z-index: 99 !important;
+}

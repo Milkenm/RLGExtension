@@ -27,7 +27,7 @@ class ItemValue {
 			this.retrieveUnix = getCurrentUnix();
 		}
 		// Instanciate an existing ItemValue
-		else if (arguments == 1) {
+		else if (arguments.length == 1) {
 			this.itemUrl = arguments[0].itemUrl;
 			this.minPrice = arguments[0].minPrice;
 			this.maxPrice = arguments[0].maxPrice;
@@ -44,30 +44,85 @@ class ItemValue {
 	}
 }
 
-const items = document.getElementsByClassName("rlg-item");
-for (i = 0; i < items.length; i++) {
-	if (items == null) { break; }
-	let links = items[i].getElementsByClassName("rlg-item-links")[0];
+const items = document.querySelectorAll(".rlg-item");
+for (let item of items) {
+	// Get links
+	let links = item.querySelector(".rlg-item-links");
 	if (links == null) { break; }
-	let primary = links.getElementsByClassName("rlg-btn-primary")[0];
+	// Get "Item Details" button
+	let primary = links.querySelector(".rlg-btn-primary");
 	if (primary == null) { continue; }
+	// Get button href
 	let link = primary.href;
-	let newLink = getItemInfo(link);
+	let newLink = convertUrl(link);
+	// Check if the link/item is valid
 	if (newLink != null) {
 		getItemValues(newLink, platforms.PC, (itemValue) => {
-			// Create the "Bump All" button
-			let bumpAllButton = document.createElement("a");
-			bumpAllButton.textContent = itemValue.minPrice + " - " + itemValue.maxPrice;
+			// Create the price label
+			let priceLabel = document.createElement("a");
+			priceLabel.classList = "rlge-a-item-value rlg-item__cert";
+			if (itemValue.minPrice != null && itemValue.maxPrice != null) {
+				priceLabel.textContent = itemValue.minPrice + " - " + itemValue.maxPrice;
+			}
+			else {
+				priceLabel.textContent = "No Price";
+			}
 
-			links.insertBefore(bumpAllButton, links[0]);
+			links.insertBefore(priceLabel, links[0]);
 		});
 	}
 }
 
-function getItemInfo(url) {
-	if (url.includes("credits")) {
+// Converts URLs from rocket-league.com to rl.insider.gg
+function convertUrl(url) {
+	// Ignore fake items from rocket-league.com
+	const fakeItems = [
+		"bronze-present",
+		"common-well",
+		"esports-tokens",
+		"or",
+		"overpay",
+		"placeholder",
+		"uncommon-drop",
+		"credits",
+		"credits-offer",
+		"africa",
+		"asia-and-oceania",
+		"eastern-europe",
+		"federation-banners",
+		"middle-east",
+		"north-america",
+		"northern-europe",
+		"south-america",
+		"southern-europe",
+		"western-europe",
+		"all-stars-cup",
+		"challengers-cup",
+		"champions-cup",
+		"prospects-cup",
+		"rare-drop",
+		"silver-present",
+		"very-rare-drop",
+		"import-drop",
+		"exotic-drop",
+		"gold-present",
+		"sp",
+		"tickets",
+		"black-market-drop",
+		"non-crate-import-offer",
+		"non-crate-very-rare-offer",
+		"non-crate-exotic-offer",
+		"offer",
+		"very-rare-offer",
+		"rare-offer",
+		"import-offer",
+		"exotic-offer",
+		"black-market-offer",
+	]
+	if (fakeItems.some(fi => url.endsWith("items/misc/" + fi)) || url.endsWith("paintedset")) {
 		return null;
 	}
+
 	/*
 	 * Example decal (Black Market Stride Tide):
 	 * RLG: https://rocket-league.com/items/decals/blackmarket/stride-tide
@@ -89,7 +144,7 @@ function getItemInfo(url) {
 	// Replace base URL
 	let newUrl = url.replace("https://rocket-league.com/items/", "https://rl.insider.gg/en/<platform>/");
 
-	let replacements = [
+	const replacements = [
 		/*
 		 * Colors
 		 */
@@ -210,9 +265,10 @@ function getItemValues(url, platform, callback) {
 	url = url.replace("<platform>", platform);
 	let proxyUrl = 'https://corsproxy.milkenm.workers.dev/?' + encodeURIComponent(url);
 	// Get value from localStorage
-	let localItem = localStorage.getItem(url);
+	let localItem = localStorage.getItem("rlge_" + url);
 	if (localItem != null) {
 		let parsedItem = new ItemValue(JSON.parse(localItem));
+		// Check if the localStorage was fetched the previous day
 		if (!parsedItem.needsUpdate()) {
 			callback(parsedItem);
 			return;
@@ -261,7 +317,7 @@ function getItemValues(url, platform, callback) {
 				let maxBpPrice = maxPrice - craftPrice;
 
 				let iv = new ItemValue(url, minPrice, maxPrice, avgPrice, craftPrice, minBpPrice, maxBpPrice);
-				localStorage.setItem(url, JSON.stringify(iv));
+				localStorage.setItem("rlge_" + url, JSON.stringify(iv));
 				callback(iv);
 			});
 		})
