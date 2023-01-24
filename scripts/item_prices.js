@@ -5,115 +5,46 @@ const platforms = {
 	SWITCH: "switch"
 };
 
-const types = {
-	DECAL: "decals",
-	CRATE: "crates",
-	BODY: "cars",
-	PAINT_FINISH: "paint_finishes",
-	WHEELS: "wheels",
-	BOOST: "boosts",
-	TOPPER: "toppers",
-	ANTENNA: "antennas",
-	GOAL_EXPLOSION: "goal_explosions",
-	TRAIL: "trails",
-	ENGINE_SOUND: "engine_sounds",
-	BANNER: "banners",
-	BORDER: "avatar_borders"
-};
-
-const subTypes = {
-	ROASTED: "roasted",
-	OBVERSE: "obvserse",
-	INVERTED: "inverted",
-	INFINITE: "infinite",
-	CRYSTALIZED: "crystalized",
-	HOLOGRAPHIC: "holographic",
-	GLITCHED: "glitched",
-	REVOLVED: "revolved",
-	HATCH: "hatch",
-	RADIANT: "radiant",
-	SACRED: "sacred",
-	REMIXED: "remixed",
-	FLARE: "flare",
-	SCHEMATIZED: "schematized",
-	MULTICHROME: "multichrome",
-	SCORCHED: "scorched",
-	FROZEN: "frozen"
-};
-
-const colors = {
-	UNPAINTED: "",
-	BLACK: "black",
-	TITANIUM_WHITE: "white",
-	GREY: "grey",
-	CRIMSON: "crimson",
-	PINK: "pink",
-	COBALT: "cobalt",
-	SKY_BLUE: "sblue",
-	BURNT_SIENNA: "sienna",
-	SAFFRON: "saffron",
-	LIME: "lime",
-	FOREST_GREEN: "fgreen",
-	PURPLE: "purple",
-	GOLD: "gold"
-};
-
-const cars = {
-	GLOBAL: "global",
-	ANIMUS_GP: "animus_gp",
-	DOMINUS: "dominus",
-	BREAKOUT: "breakout",
-	TAKUMI: "takumi",
-	OCTANE: "octane",
-	FENNEC: "fennec",
-	DOMINUS_GT: "dominus_gt",
-	TAKUMI_RX_T: "takumi_rx_t",
-	BREAKOUT_TYPE_S: "breakout_type_s",
-	OCTANE_ZSR: "octane_zsr"
+function getCurrentUnix() {
+	return Math.floor(Date.now() / 1000);
 }
 
-class ItemInfo {
-	constructor(itemName, itemType, itemSubType, itemColor, car) {
-		this.car = car;
-		this.itemName = itemName;
-		this.itemType = itemType;
-		this.itemSubType = itemSubType;
-		this.itemColor = itemColor;
-	}
-
-	displayInfo() {
-		return "Item Name: " + this.itemName
-			+ "\nItem Type: " + this.itemType
-			+ "\nItem Sub-Type: " + this.itemSubType
-			+ "\nItem Color: " + this.itemColor
-			+ "\nCar: " + this.car;
-	}
+function unixToDays(unixTimestamp, offset) {
+	return Math.floor((unixTimestamp + offset) / 86400000);
 }
 
 class ItemValue {
-	constructor(item, minPrice, maxPrice, avgPrice, craftPrice, minBpPrice, maxBpPrice) {
-		this.item = item;
-		this.minPrice = minPrice;
-		this.maxPrice = maxPrice;
-		this.avgPrice = avgPrice;
-		this.craftPrice = craftPrice;
-		this.minBpPrice = minBpPrice;
-		this.maxBpPrice = maxBpPrice;
+	constructor() {
+		// Create new ItemValue
+		if (arguments.length == 7) {
+			this.itemUrl = arguments[0];
+			this.minPrice = arguments[1];
+			this.maxPrice = arguments[2];
+			this.avgPrice = arguments[3];
+			this.craftPrice = arguments[4];
+			this.minBpPrice = arguments[5];
+			this.maxBpPrice = arguments[6];
+			this.retrieveUnix = getCurrentUnix();
+		}
+		// Instanciate an existing ItemValue
+		else if (arguments == 1) {
+			this.itemUrl = arguments[0].itemUrl;
+			this.minPrice = arguments[0].minPrice;
+			this.maxPrice = arguments[0].maxPrice;
+			this.avgPrice = arguments[0].avgPrice;
+			this.craftPrice = arguments[0].craftPrice;
+			this.minBpPrice = arguments[0].minBpPrice;
+			this.maxBpPrice = arguments[0].maxBpPrice;
+			this.retrieveUnix = arguments[0].retrieveUnix;
+		}
 	}
 
-	displayInfo() {
-		return "Item: " + this.item
-			+ "\nMinimum price: " + this.minPrice
-			+ "\nMaximum price: " + this.maxPrice
-			+ "\nAverage price: " + this.avgPrice
-			+ "\nCrafting Cost: " + this.craftPrice
-			+ "\nMinimum Blueprint Value: " + this.minBpPrice
-			+ "\nMaximum Blueprint Value: " + this.maxBpPrice;
+	needsUpdate() {
+		return unixToDays(this.retrieveUnix, 7200) < unixToDays(getCurrentUnix(), 0);
 	}
 }
 
 const items = document.getElementsByClassName("rlg-item");
-
 for (i = 0; i < items.length; i++) {
 	if (items == null) { break; }
 	let links = items[i].getElementsByClassName("rlg-item-links")[0];
@@ -246,8 +177,6 @@ function getItemInfo(url) {
 		["winters_warmth", "winter_s_warmth"]
 	];
 	for (let i = 0; i < replacements.length; i++) {
-		console.log("index: " + i);
-		console.log("r1: " + replacements[i][0] + ", r2: " + replacements[i][1]);
 		newUrl = newUrl.replaceAll(replacements[i][0], replacements[i][1]);
 	}
 
@@ -272,7 +201,6 @@ function getItemInfo(url) {
 			newName += rewardSplit[i];
 		}
 		newUrl = newUrl.replace(itemName, newName);
-		console.log("new url: " + newUrl);
 	}
 
 	return newUrl;
@@ -281,13 +209,22 @@ function getItemInfo(url) {
 function getItemValues(url, platform, callback) {
 	url = url.replace("<platform>", platform);
 	let proxyUrl = 'https://corsproxy.milkenm.workers.dev/?' + encodeURIComponent(url);
+	// Get value from localStorage
+	let localItem = localStorage.getItem(url);
+	if (localItem != null) {
+		let parsedItem = new ItemValue(JSON.parse(localItem));
+		if (!parsedItem.needsUpdate()) {
+			callback(parsedItem);
+			return;
+		}
+	}
+	// Get value from rl.insider.gg
 	fetch(proxyUrl)
 		.then((response) => {
 			if (response.status != 200) {
 				if (response.status == 503) {
 					return getItemValues(url, platform, callback);
 				}
-				console.log("There was a problem obtaining price info for item.");
 				/*return getItemValues(url, platform, callback);*/
 				return null;
 			}
@@ -324,10 +261,11 @@ function getItemValues(url, platform, callback) {
 				let maxBpPrice = maxPrice - craftPrice;
 
 				let iv = new ItemValue(url, minPrice, maxPrice, avgPrice, craftPrice, minBpPrice, maxBpPrice);
+				localStorage.setItem(url, JSON.stringify(iv));
 				callback(iv);
 			});
 		})
 		.catch((error) => {
-			console.log("There was a problem obtaining price info for item:\n" + error);
+			// Error loading item
 		});
 }
