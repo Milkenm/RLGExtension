@@ -77,69 +77,21 @@ for (let item of items) {
 function convertUrl(url) {
 	// Ignore fake items from rocket-league.com
 	const fakeItems = [
-		"bronze-present",
 		"common-well",
-		"esports-tokens",
-		"or",
-		"overpay",
-		"placeholder",
-		"uncommon-drop",
-		"credits",
-		"credits-offer",
-		"africa",
-		"asia-and-oceania",
-		"eastern-europe",
-		"federation-banners",
-		"middle-east",
-		"north-america",
-		"northern-europe",
-		"south-america",
-		"southern-europe",
-		"western-europe",
-		"all-stars-cup",
-		"challengers-cup",
-		"champions-cup",
-		"prospects-cup",
-		"rare-drop",
-		"silver-present",
-		"very-rare-drop",
-		"import-drop",
-		"exotic-drop",
-		"gold-present",
-		"sp",
-		"tickets",
+		"or", "overpay", "placeholder",
+		"credits", "credits-offer", "esports-tokens", "sp", "tickets",
+		"africa", "asia-and-oceania", "eastern-europe", "federation-banners", "middle-east", "north-america", "northern-europe",
+		"south-america", "southern-europe", "western-europe",
+		"all-stars-cup", "challengers-cup", "champions-cup", "prospects-cup",
+		"bronze-present", "silver-present", "gold-present",
+		"uncommon-drop", "rare-drop", "very-rare-drop", "import-drop", "exotic-drop",
 		"black-market-drop",
-		"non-crate-import-offer",
-		"non-crate-very-rare-offer",
-		"non-crate-exotic-offer",
-		"offer",
-		"very-rare-offer",
-		"rare-offer",
-		"import-offer",
-		"exotic-offer",
-		"black-market-offer",
+		"non-crate-uncommon-offer", "non-crate-rare-offer", "non-crate-very-rare-offer", "non-crate-import-offer", "non-crate-exotic-offer", "offer",
+		"uncommon-offer", "rare-offer", "very-rare-offer", "import-offer", "exotic-offer", "black-market-offer", "limited-offer"
 	]
 	if (fakeItems.some(fi => url.endsWith("items/misc/" + fi)) || url.endsWith("paintedset")) {
 		return null;
 	}
-
-	/*
-	 * Example decal (Black Market Stride Tide):
-	 * RLG: https://rocket-league.com/items/decals/blackmarket/stride-tide
-	 * RLI: https://rl.insider.gg/en/pc/decals/stride_tide
-	 * 
-	 * Example decal 2 (Import Distortion [Dominus])
-	 * RLG: https://rocket-league.com/items/decals/dominus/distortion
-	 * RLI: https://rl.insider.gg/en/pc/decals/dominus/distortion
-	 * 
-	 * Example wheels (Exotic Dire Wolf [Black]):
-	 * RLG: https://rocket-league.com/items/wheels/dire-wolf
-	 * RLI: https://rl.insider.gg/en/pc/wheels/dire_wolf/black
-	 * 
-	 * Example crate (Golden Gift '22):
-	 * RLG: https://rocket-league.com/items/misc/golden-gift-22
-	 * RLI: https://rl.insider.gg/en/pc/crates/golden_gift_22
-	 */
 
 	// Replace base URL
 	let newUrl = url.replace("https://rocket-league.com/items/", "https://rl.insider.gg/en/<platform>/");
@@ -148,30 +100,14 @@ function convertUrl(url) {
 		/*
 		 * Colors
 		 */
-		["titaniumwhite", "white"],
-		["skyblue", "sblue"],
-		["burntsienna", "sienna"],
-		["forestgreen", "fgreen"],
+		["titaniumwhite", "white"], ["skyblue", "sblue"], ["burntsienna", "sienna"], ["forestgreen", "fgreen"],
 		/* 
 		 * Sub-types
 		 */
-		["-roasted", "/roasted"],
-		["-obverse", "/obverse"],
-		["-inverted", "/inverted"],
-		["-infinite", "/infinite"],
-		["-cystalized", "/crystalized"],
-		["-holographic", "/holographic"],
-		["-glitched", "/glitched"],
-		["-revolved", "/revolved"],
-		["-hatch", "/hatch"],
-		["-radiant", "/radiant"],
-		["-sacred", "/sacred"],
-		["-remixed", "/remixed"],
-		["-flare", "/flare"],
-		["-schematized", "/schematized"],
-		["-multichrome", "/multichrome"],
-		["-scorched", "/scorched"],
-		["-frozen", "/frozen"],
+		["-roasted", "/roasted"], ["-obverse", "/obverse"], ["-inverted", "/inverted"], ["-infinite", "/infinite"],
+		["-cystalized", "/crystalized"], ["-holographic", "/holographic"], ["-glitched", "/glitched"], ["-revolved", "/revolved"],
+		["-hatch", "/hatch"], ["-radiant", "/radiant"], ["-sacred", "/sacred"], ["-remixed", "/remixed"], ["-flare", "/flare"],
+		["-schematized", "/schematized"], ["-multichrome", "/multichrome"], ["-scorched", "/scorched"], ["-frozen", "/frozen"],
 		/*
 		 * Replace - with _
 		 */
@@ -195,8 +131,7 @@ function convertUrl(url) {
 		 * https://rocket-league.com/items/decals/octane/tumbling-blocks
 		 * https://rocket-league.com/items/decals/octane/tumbling-blocks/black
 		 */
-		["blackmarket/", ""],
-		["global/", ""],
+		["blackmarket/", ""], ["global/", ""],
 		/*
 		 * Paint Finishes
 		 * https://rocket-league.com/items/paints/chipboard
@@ -217,19 +152,9 @@ function convertUrl(url) {
 		/*
 		 * This: '
 		 */
-		["jakd", "jak_d"],
-		["smore", "s_more"],
-		["widows_web", "widow_s_web"],
-		["pirates_hat", "pirate_s_hat"],
-		["chefs_hat", "chef_s_hat"],
-		["witchs_hat", "witch_s_hat"],
-		["bobs_ramen", "bob_s_ramen"],
-		["devils_advocate", "devil_s_advocate"],
-		["captains_hat", "captain_s_hat"],
-		["sloths_hat", "slot_s_hat"],
-		["new_years_2017", "new_year_s_2017"],
-		["daves_bread", "dave_s_bread"],
-		["winters_warmth", "winter_s_warmth"]
+		["jakd", "jak_d"], ["smore", "s_more"], ["widows_web", "widow_s_web"], ["pirates_hat", "pirate_s_hat"], ["chefs_hat", "chef_s_hat"],
+		["witchs_hat", "witch_s_hat"], ["bobs_ramen", "bob_s_ramen"], ["devils_advocate", "devil_s_advocate"], ["captains_hat", "captain_s_hat"],
+		["sloths_hat", "slot_s_hat"], ["new_years_2017", "new_year_s_2017"], ["daves_bread", "dave_s_bread"], ["winters_warmth", "winter_s_warmth"]
 	];
 	for (let i = 0; i < replacements.length; i++) {
 		newUrl = newUrl.replaceAll(replacements[i][0], replacements[i][1]);
