@@ -32,9 +32,6 @@
 		"scripts/item_prices/item_prices.css"
 	  ]
 	},
-	{
-	  "matches": [
-		"https://rocket-league.com/*"
 	// Trade bumper
 	{
 	  "matches": [
