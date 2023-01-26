@@ -5,71 +5,24 @@ const platforms = {
 	SWITCH: "switch"
 };
 
-function getCurrentUnix() {
-	return Math.floor(Date.now() / 1000);
-}
-
-function unixToDays(unixTimestamp, offset) {
-	return Math.floor((unixTimestamp + offset) / 86400000);
-}
-
 class ItemValue {
 	constructor() {
 		// Create new ItemValue
-		if (arguments.length == 7) {
-			this.itemUrl = arguments[0];
-			this.minPrice = arguments[1];
-			this.maxPrice = arguments[2];
-			this.avgPrice = arguments[3];
-			this.craftPrice = arguments[4];
-			this.minBpPrice = arguments[5];
-			this.maxBpPrice = arguments[6];
+		if (arguments.length == 2) {
+			this.minPrice = arguments[0];
+			this.maxPrice = arguments[1];
 			this.retrieveUnix = getCurrentUnix();
 		}
 		// Instanciate an existing ItemValue
 		else if (arguments.length == 1) {
-			this.itemUrl = arguments[0].itemUrl;
 			this.minPrice = arguments[0].minPrice;
 			this.maxPrice = arguments[0].maxPrice;
-			this.avgPrice = arguments[0].avgPrice;
-			this.craftPrice = arguments[0].craftPrice;
-			this.minBpPrice = arguments[0].minBpPrice;
-			this.maxBpPrice = arguments[0].maxBpPrice;
 			this.retrieveUnix = arguments[0].retrieveUnix;
 		}
 	}
 
 	needsUpdate() {
 		return unixToDays(this.retrieveUnix, 7200) < unixToDays(getCurrentUnix(), 0);
-	}
-}
-
-const items = document.querySelectorAll(".rlg-item");
-for (let item of items) {
-	// Get links
-	let links = item.querySelector(".rlg-item-links");
-	if (links == null) { break; }
-	// Get "Item Details" button
-	let primary = links.querySelector(".rlg-btn-primary");
-	if (primary == null) { continue; }
-	// Get button href
-	let link = primary.href;
-	let newLink = convertUrl(link);
-	// Check if the link/item is valid
-	if (newLink != null) {
-		getItemValues(newLink, platforms.PC, (itemValue) => {
-			// Create the price label
-			let priceLabel = document.createElement("a");
-			priceLabel.classList = "rlge-a-item-value rlg-item__cert";
-			if (itemValue.minPrice != null && itemValue.maxPrice != null) {
-				priceLabel.textContent = itemValue.minPrice + " - " + itemValue.maxPrice;
-			}
-			else {
-				priceLabel.textContent = "No Price";
-			}
-
-			links.insertBefore(priceLabel, links[0]);
-		});
 	}
 }
 
@@ -165,7 +118,7 @@ function convertUrl(url) {
 		newUrl = newUrl.replace("pixelated_shades", "pixelated_shades/rare");
 	}
 
-	// Alpha + Beta Rewards
+	// Alpha and Beta Rewards
 	if (newUrl.includes("aplha_reward") || newUrl.includes("beta_reward")) {
 		let rewardSplit = newUrl.split("/");
 		let itemName = rewardSplit[rewardSplit.length - 1];
@@ -186,12 +139,13 @@ function convertUrl(url) {
 	return newUrl;
 }
 
+// Get the minimum and maximum price for an item from a rl.insider.gg URL
 function getItemValues(url, platform, callback) {
 	url = url.replace("<platform>", platform);
 	let proxyUrl = 'https://corsproxy.milkenm.workers.dev/?' + encodeURIComponent(url);
 	// Get value from localStorage
 	let localItem = localStorage.getItem("rlge_" + url);
-	if (localItem != null) {
+	if (localItem != null && false) {
 		let parsedItem = new ItemValue(JSON.parse(localItem));
 		// Check if the localStorage was fetched the previous day
 		if (!parsedItem.needsUpdate()) {
@@ -202,51 +156,66 @@ function getItemValues(url, platform, callback) {
 	// Get value from rl.insider.gg
 	fetch(proxyUrl)
 		.then((response) => {
+			// Failed to get item info
 			if (response.status != 200) {
+				// Service unavailable
 				if (response.status == 503) {
+					// Attempt to get item info again
 					return getItemValues(url, platform, callback);
 				}
-				/*return getItemValues(url, platform, callback);*/
+				callback(null);
 				return null;
 			}
+			// After getting the info
 			response.text().then((text) => {
-				// Get item cost
-				let itemCostStr = text.substring(
-					text.indexOf("currentPriceRange") + 20,
-					text.indexOf("currentPriceRange") + 35,
-				);
-				let itemCost = "";
-				for (let c of itemCostStr) {
-					if (c == "\"") break;
-					itemCost += c;
+				// Get all lines from the response
+				let splitLines = text.split("\n");
+				for (let line of splitLines) {
+					// Check if it's the line with the item data variable (const itemData)
+					if (line.includes("const itemData")) {
+						// Format the string
+						let splitLine = line.split("const itemData = ");
+						let jsonString = splitLine[1].slice(0, -1);
+
+						// Convert the string to an object
+						let obj = JSON.parse(jsonString);
+
+						// Get the price
+						let currentPrice = obj.currentPriceRange;
+						// Remove all spaces and dots from the price string
+						currentPrice = currentPrice.replaceAll(" ", "").replaceAll(".", "");
+
+						// Calculate the item price multiplier case the price has "k" or "million" (alpha items)
+						let multiplier = 1;
+						// Has thousands
+						if (currentPrice.includes("k")) {
+							currentPrice = currentPrice.replaceAll("k", "");
+							multiplier = 1_000;
+						}
+						// Has millions
+						else if (currentPrice.includes("million")) {
+							currentPrice = currentPrice.replaceAll("million", "");
+							multiplier = 1_000_000;
+						}
+
+						// The price is a string "20 - 40", so we split into "20 " and " 40" (with the spaces)
+						let priceSplit = obj.currentPriceRange.split("-");
+						// Get minimum and maximum price, multiplying it if needed.
+						let minPrice = parseInt(priceSplit[0]) * multiplier;
+						let maxPrice = parseInt(priceSplit[1]) * multiplier;
+
+						// Create a new ItemValue object
+						let itemValue = new ItemValue(minPrice, maxPrice);
+						localStorage.setItem("rlge_" + url.replace("https://rl.insider.gg/en/", ""), JSON.stringify(itemValue));
+						callback(itemValue);
+						return;
+					}
 				}
-
-				// Get crafting cost
-				let craftingCostStr = text.substring(
-					text.indexOf("ingameViewContainerDesktop") - 97,
-					text.indexOf("ingameViewContainerDesktop") - 90
-				)
-				let craftingCost = "";
-				for (let c of craftingCostStr) {
-					if (c == "<") break;
-					craftingCost += c;
-				}
-
-				// Calculate values
-				let splitPrice = itemCost.split(" - ");
-				let minPrice = parseInt(splitPrice[0]);
-				let maxPrice = parseInt(splitPrice[1]);
-				let avgPrice = (minPrice + maxPrice) / 2;
-				let craftPrice = parseInt(craftingCost);
-				let minBpPrice = minPrice - craftPrice;
-				let maxBpPrice = maxPrice - craftPrice;
-
-				let iv = new ItemValue(url, minPrice, maxPrice, avgPrice, craftPrice, minBpPrice, maxBpPrice);
-				localStorage.setItem("rlge_" + url, JSON.stringify(iv));
-				callback(iv);
 			});
 		})
 		.catch((error) => {
 			// Error loading item
+			callback(null);
+			return null;
 		});
 }

@@ -5,6 +5,7 @@
   "author": "Milkenm",
   "description": "Bump all trades on RL Garage with a single click.",
   "content_scripts": [
+	// Global style
 	{
 	  "matches": [
 		"https://rocket-league.com/*"
@@ -14,28 +15,37 @@
 		"styles/rlge_overrides.css"
 	  ]
 	},
+	// Item prices (trades)
+	{
+	  "matches": [
+		"https://rocket-league.com/trading",
+		"https://rocket-league.com/player/*",
+		"https://rocket-league.com/trades/*"
+	  ],
+	  "run_at": "document_end",
+	  "js": [
+		"scripts/utils.js",
+		"scripts/item_prices/item_prices_utils.js",
+		"scripts/item_prices/item_prices.js"
+	  ],
+	  "css": [
+		"scripts/item_prices/item_prices.css"
+	  ]
+	},
+	{
+	  "matches": [
+		"https://rocket-league.com/*"
+	// Trade bumper
 	{
 	  "matches": [
 		"https://rocket-league.com/trades/*"
 	  ],
 	  "run_at": "document_end",
 	  "js": [
-		"scripts/trade_bumper.js"
+		"scripts/trade_bumper/trade_bumper.js"
 	  ],
 	  "css": [
-		"styles/rlge_style.css"
-	  ]
-	},
-	{
-	  "matches": [
-		"https://rocket-league.com/*"
-	  ],
-	  "run_at": "document_end",
-	  "js": [
-		"scripts/item_prices.js"
-	  ],
-	  "css": [
-		"styles/rlge_prices.css"
+		"scripts/trade_bumper/trade_bumper.css"
 	  ]
 	}
   ],
