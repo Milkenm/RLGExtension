@@ -23,11 +23,12 @@ if (window.location.href.startsWith("https://rocket-league.com/trades/")) {
 
 function bumpAllTrades()
 {
-    const bumpDelay = 1250;
+    const bumpDelay = 2000;
 
     // Get all "Bump" buttons
     let bumpButtons = document.getElementsByClassName("rlg-trade__bump");
 
+    // Hide the bump success popup
     const successPopup = document.getElementsByClassName("rlg-site-popup")[0];
     successPopup.style.display = "none";
 
@@ -38,8 +39,9 @@ function bumpAllTrades()
         }, i * bumpDelay);
     }
 
+    // Show the bump success popup
     setTimeout(() => {
         successPopup.style.display = null;
         alert("Bumped all trades.");
-    }, bumpButtons.length - 1 * bumpDelay);
+    }, (bumpButtons.length - 1) * bumpDelay);
 }
