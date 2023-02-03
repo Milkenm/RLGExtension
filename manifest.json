@@ -32,9 +32,21 @@
 		"scripts/item_prices/item_prices.css"
 	  ]
 	},
+	// Item prices (trade editor)
 	{
 	  "matches": [
-		"https://rocket-league.com/*"
+		"https://rocket-league.com/trade/edit?trade=*"
+	  ],
+	  "run_at": "document_end",
+	  "js": [
+		"scripts/utils.js",
+		"scripts/item_prices/item_prices_utils.js",
+		"scripts/item_prices/item_prices_trades.js"
+	  ],
+	  "css": [
+		"scripts/item_prices/item_prices_trades.css"
+	  ]
+	},
 	// Trade bumper
 	{
 	  "matches": [
