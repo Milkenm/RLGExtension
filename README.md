@@ -1,13 +1,5 @@
-[ChromeWebstoreBadgeW]: https://wd.imgix.net/image/BrQidfK9jaQyIHwdw91aVpkPiib2/LclHxMxqoswLNRcUW3m5.png?auto=format&w=228
-[ChromeWebstoreBadgeB]: https://wd.imgix.net/image/BrQidfK9jaQyIHwdw91aVpkPiib2/RQMv2HZ0v6NKfFn7XCeU.png?auto=format&w=228
-[ExtensionPage]: https://chrome.google.com/webstore/detail/rlg-extension/bcfhdepgcnpnomghdhpgmodjikeipabd
-
-# RLG Extension
-[![ChromeWebstoreBadgeB]][ExtensionPage]
-
-## Features
-- Bump all trades with a single click.
-
-### Future Updates
-- View item prices; ***\*WIP\****
-- Item value/price hightlight.
+# Archived
+In case you didn't know, [Epic is removing trading](https://www.rocketleague.com/news/removing-playertoplayer-trading-in-december/) from Rocket League on December 5, so there is no point in continuing the development of this extension.
+<br/>
+<br/>
+If you want to know what this extension was for: it added a lil "Bump All" button to [RL Garage](https://rocket-league.com/) trades page, so you didn't have to go to every trade and bump it manually. Prices below the items was in-dev, based on [Rocket League Insider](https://rl.insider.gg/).
